@@ -15,29 +15,41 @@ var currentDistance = [undefined,0,0]
 var currentBonus = [undefined,0,0]
 var activeTeam
 var categories = [
-"School Supplies",
-"Movie Titles",
+"School supplies",
+"Movie titles",
 "Mammals",
-"Aquatic Animals",
+"Aquatic animals",
 "Vehicles",
 "Plants",
 "Countries",
 "Drinks",
-"Types of Exercise",
-"Star Wars Characters",
+"Types of exercise",
+"Star Wars characters",
 "Things to pack on a trip",
-"TV Characters",
+"TV characters",
 "Cities",
 "Things in a bedroom",
 "Things in a kitchen",
 "Things in a park",
 "Languages",
-"People in the Bible"
+"People in the Bible",
+"Things you're afraid of",
+"Things that are delicious",
+"Celebrities",
+"Song titles",
+"School subjects",
+"Fairy tales",
+"Things in the ocean",
+"Marvel characters",
+"Fast food restaurants"
 ]
+var unusedCatIndices = []
 var containerAnim
 var countdownInterval = undefined
 function gameAttachDOM()
 {
+	resetUnusedCats()
+
 	// create letter carousel
 	var container = document.getElementById("lettersContainer");
 	for (var letter of letters)
@@ -305,11 +317,20 @@ function setCountdownTimer()
 	var startButton = document.getElementById("startButton")
 	startButton.innerHTML = "Pause"
 }
+function resetUnusedCats()
+{
+	unusedCatIndices = Array.from(Array(categories.length).keys())
+}
 function generateCategory()
 {
+	if (unusedCatIndices.length == 0)
+	{
+		resetUnusedCats()
+	}
 	var categoryText = document.getElementById("categoryText")
-	var catIndex = Math.floor(Math.random() * categories.length)
-	categoryText.innerHTML = categories[catIndex]
+	var unusedCatIndex = Math.floor(Math.random() * unusedCatIndices.length)
+	categoryText.innerHTML = categories[unusedCatIndices[unusedCatIndex]]
+	unusedCatIndices.splice(unusedCatIndex, 1)
 }
 function clearCategory()
 {

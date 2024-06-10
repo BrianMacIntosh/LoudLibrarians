@@ -4,7 +4,6 @@ Display all bonus letters
 Max 6 bonus pts
 More categories
 
-No repeat cats
 Background image
 More cats
 Round plus reset all
