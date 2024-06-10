@@ -1,4 +1,3 @@
-Disable carousel interaction when not timed
 Whole-game scoring
 Display all bonus letters
 More categories
