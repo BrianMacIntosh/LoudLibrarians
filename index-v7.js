@@ -7,6 +7,7 @@ var letters = [
 var activeBonusLetters = []
 var trailingExtras = 5
 var timerTotal = 60
+var maxRoundScore = 7
 var timer = 0
 var roundNumber = 1
 var currentLetterIndex = [undefined,0,0]
@@ -130,9 +131,11 @@ function setBonusPoints(team, points)
 {
 	currentBonus[team] = points > 1 ? points : 1
 
+	var displayedBonus = Math.min(currentBonus[team], maxRoundScore)
+
 	// update display
 	var element = document.getElementById(`teamBonus${team}`);
-	element.innerHTML = currentBonus[team].toString()
+	element.innerHTML = displayedBonus.toString()
 }
 function reinitializeCarousel()
 {
