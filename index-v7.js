@@ -82,28 +82,40 @@ function gameAttachDOM()
 }
 function handleLetterClicked(event)
 {
+	console.log(`Clicked letter box '${event.currentTarget.id}.`)
+
 	if (!event.currentTarget.classList.contains("letterBoxDisabled"))
 	{
-		var letter = event.currentTarget.id.substring(event.currentTarget.id.length - 2)
+		var letterId = event.currentTarget.id.substring(event.currentTarget.id.length - 2)
+		checkAwardBonus(letterId);
 
-		// award bonus
-		if (activeBonusLetters.indexOf(letter.substring(0, 1)) >= 0)
-		{
-			recordBonusPoint()
-		}
-
-		var letterIndex = letters.indexOf(letter)
+		var letterIndex = letters.indexOf(letterId)
 		var newIndex = letterIndex + 1
 		navigateLetter(newIndex)
+	}
+}
+function isBonusLetter(letter)
+{
+	return activeBonusLetters.indexOf(letter.substring(0, 1)) >= 0
+}
+function checkAwardBonus(letter)
+{
+	if (isBonusLetter(letter))
+	{
+		recordBonusPoint()
 	}
 }
 function recordBonusPoint()
 {
 	setBonusPoints(currentBonus[activeTeam] + 1, activeTeam)
 }
+function deductBonusPoint()
+{
+	setBonusPoints(currentBonus[activeTeam] - 1, activeTeam)
+}
 function setBonusPoints(points, team)
 {
-	currentBonus[activeTeam] = points
+	currentBonus[activeTeam] = points > 1 ? points : 1
 
 	// update display
 	var element = document.getElementById(`teamBonus${activeTeam}`);
@@ -152,20 +164,29 @@ function navigateLetter(index)
 }
 function undoLetter()
 {
-	if (lastLetterIndex[activeTeam] !== undefined)
+	var newIndex = lastLetterIndex[activeTeam]
+
+	if (newIndex !== undefined)
 	{
 		// undo distance
-		currentDistance[activeTeam] -= currentLetterIndex[activeTeam] - lastLetterIndex[activeTeam]
+		currentDistance[activeTeam] -= currentLetterIndex[activeTeam] - newIndex
 		updateTeamDistance(activeTeam)
+
+		// undo bonus points
+		if (isBonusLetter(letters[newIndex]))
+		{
+			console.log("Challenge deducted one bonus point.")
+			deductBonusPoint()
+		}
 
 		// move carousel
 		var container = document.getElementById("lettersContainer")
 		containerAnim = container.animate([
 			{ left: `-${100*currentLetterIndex[activeTeam]/3}%` },
-			{ left: `-${100*lastLetterIndex[activeTeam]/3}%` }
+			{ left: `-${100*newIndex/3}%` }
 		], { duration: 600, fill:"forwards" })
 
-		currentLetterIndex[activeTeam] = lastLetterIndex[activeTeam]
+		currentLetterIndex[activeTeam] = newIndex
 		lastLetterIndex[activeTeam] = undefined
 	}
 }
@@ -312,8 +333,8 @@ function handleRoundPlus()
 	generateBonusLetter()
 
 	// reset round bonuses
-	setBonusPoints(0, 1)
-	setBonusPoints(0, 2)
+	setBonusPoints(1, 1)
+	setBonusPoints(1, 2)
 }
 function generateBonusLetter()
 {
