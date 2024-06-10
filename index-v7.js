@@ -90,6 +90,7 @@ function gameAttachDOM()
 
 	disableCarousel()
 	clearCategory()
+	resetScores()
 	setActiveTeam(1)
 }
 function handleLetterClicked(event)
@@ -119,25 +120,22 @@ function checkAwardBonus(letter)
 }
 function recordBonusPoint()
 {
-	setBonusPoints(currentBonus[activeTeam] + 1, activeTeam)
+	setBonusPoints(activeTeam, currentBonus[activeTeam] + 1)
 }
 function deductBonusPoint()
 {
-	setBonusPoints(currentBonus[activeTeam] - 1, activeTeam)
+	setBonusPoints(activeTeam, currentBonus[activeTeam] - 1)
 }
-function setBonusPoints(points, team)
+function setBonusPoints(team, points)
 {
-	currentBonus[activeTeam] = points > 1 ? points : 1
+	currentBonus[team] = points > 1 ? points : 1
 
 	// update display
-	var element = document.getElementById(`teamBonus${activeTeam}`);
-	element.innerHTML = currentBonus[activeTeam].toString()
+	var element = document.getElementById(`teamBonus${team}`);
+	element.innerHTML = currentBonus[team].toString()
 }
 function reinitializeCarousel()
 {
-	currentDistance[activeTeam] = 0
-	updateTeamDistance(activeTeam)
-
 	if (containerAnim){
 		containerAnim.cancel()
 		containerAnim = null
@@ -152,8 +150,7 @@ function navigateLetter(index)
 {
 	lastLetterIndex[activeTeam] = currentLetterIndex[activeTeam]
 
-	currentDistance[activeTeam] += index - currentLetterIndex[activeTeam]
-	updateTeamDistance(activeTeam)
+	setTeamDistance(activeTeam, currentDistance[activeTeam] + (index - currentLetterIndex[activeTeam]))
 
 	currentLetterIndex[activeTeam] = index
 	var container = document.getElementById("lettersContainer")
@@ -181,8 +178,7 @@ function undoLetter()
 	if (newIndex !== undefined)
 	{
 		// undo distance
-		currentDistance[activeTeam] -= currentLetterIndex[activeTeam] - newIndex
-		updateTeamDistance(activeTeam)
+		setTeamDistance(activeTeam, currentDistance[activeTeam] - (currentLetterIndex[activeTeam] - newIndex))
 
 		// undo bonus points
 		if (isBonusLetter(letters[newIndex]))
@@ -352,10 +348,14 @@ function handleRoundPlus()
 	roundNumber++
 	document.getElementById("roundLabel").innerHTML = `Round ${roundNumber}`
 	generateBonusLetter()
-
-	// reset round bonuses
+	resetScores()
+}
+function resetScores()
+{
+	setTeamDistance(1, 0)
+	setTeamDistance(2, 0)
 	setBonusPoints(1, 1)
-	setBonusPoints(1, 2)
+	setBonusPoints(2, 1)
 }
 function generateBonusLetter()
 {
@@ -380,10 +380,15 @@ function addBonusLetter(letter)
 		}
 	}
 }
-function updateTeamDistance(index)
+function setTeamDistance(team, value)
 {
-	const scoreBox = document.getElementById(`teamDistance${index}`)
-	scoreBox.innerHTML = `${currentDistance[activeTeam]}`
+	currentDistance[team] = value
+	updateTeamDistance(team)
+}
+function updateTeamDistance(team)
+{
+	const scoreBox = document.getElementById(`teamDistance${team}`)
+	scoreBox.innerHTML = `${currentDistance[team]}`
 }
 function setActiveTeam(index)
 {

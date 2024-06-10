@@ -3,7 +3,3 @@ Whole-game scoring
 Display all bonus letters
 Max 6 bonus pts
 More categories
-
-Background image
-More cats
-Round plus reset all
